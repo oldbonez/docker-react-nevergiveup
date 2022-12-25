@@ -21,8 +21,8 @@ jobs:
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
           aws_secret_key: ${{ secrets.AWS_SECRET_KEY }}
-          application_name: docker-gh
-          environment_name: Dockergh-env
+          application_name: docker
+          environment_name: Docker-env-1
           existing_bucket_name: elasticbeanstalk-eu-central-1-934544062828  
           region: us-east-1
           version_label: ${{ github.sha }}
