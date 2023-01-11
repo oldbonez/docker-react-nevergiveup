@@ -1,6 +1,18 @@
+# Intro
+
+This is a project taken from the Udemy course docker-and-kubernetes-the-complete-guide.
+The purposes of the project are
+ - apply the learned live
+ - build a docker container
+ - run npm audit
+ - run a Trivy vulnerability scanner
+ - run Snyk
+ - deploy to AWS
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
 
 ## Available Scripts
 
