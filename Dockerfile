@@ -1,7 +1,7 @@
 FROM node:19.3.0-alpine3.17 as builder
 WORKDIR '/app'
 COPY package.json .
-RUN apk update && apk upgrade && npm install && npm install -g npm-check-updates && npm install -g svgo && npm i -g lint && ncu --upgrade && rm -vrf /var/cache/apk/*
+RUN apk update && apk upgrade && npm install -g npm@9.3.1 && npm install -g npm-check-updates && npm install -g svgo && npm i -g lint && ncu --upgrade && rm -vrf /var/cache/apk/*
 COPY . .
 RUN npm run build
 
