@@ -9,6 +9,7 @@ function App() {
         <p>Bye there!</p>
         <p>ДОСВИДАНИЯ!</p>
         <p>Noshledanou!</p>
+        <p>Becoming a successful Dev(Sec)Ops may take some time. Please keep on RTFM</p>
         <a
           className="App-link"
           href="https://reactjs.org"
