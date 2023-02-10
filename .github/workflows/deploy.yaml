@@ -34,8 +34,11 @@ jobs:
       - uses: actions/checkout@v3
       - run: >-
           echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
-      - run: docker build -t DOCKER_TST -f Dockerfile.dev .
-      - run: docker run -e CI=true cygnetops/react-test npm test
+      - run: docker build -t $DOCKER_TST -f Dockerfile.dev .
+      - run: docker run -e CI=true $DOCKER_TST npm test
+      - run: docker build -t $DOCKER_PRD .
+      - run: docker push $DOCKER_TST $DOCKER_PRD
+
 
       - name: tstsast
         uses: aquasecurity/trivy-action@master
@@ -50,7 +53,7 @@ jobs:
       - name: prdsasttst
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: "docker.io/oldbonedocker/react-tst"
+          image-ref: "docker.io/oldbonedocker/ebsprd"
           format: "table"
           exit-code: "1"
           ignore-unfixed: true
