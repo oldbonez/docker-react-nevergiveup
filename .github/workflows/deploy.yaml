@@ -1,0 +1,75 @@
+name: smoketest pipe
+
+
+env:
+ DOCKER_TST: oldbonedocker/react-tst
+ DOCKER_PRD: oldbonedocker/ebsprd
+
+on:
+  push:
+    branches:
+      - main
+      - feature/*
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - main
+ 
+jobs:
+  sonarcloud:
+    name: SonarCloud
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  build:
+    name: docker_container_build_vulnscan
+    needs: [git-leaks, sonarcloud]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: >- echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+      - run: docker build -t DOCKER_TST -f Dockerfile.dev .
+      - run: docker run -e CI=true cygnetops/react-test npm test
+
+      - name: tstsast
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: "docker.io/oldbonedocker/react-tst"
+          format: "table"
+          exit-code: "1"
+          ignore-unfixed: true
+          vuln-type: "os,library"
+          severity: "CRITICAL"
+
+      - name: prdsasttst
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: "docker.io/oldbonedocker/react-tst"
+          format: "table"
+          exit-code: "1"
+          ignore-unfixed: true
+          vuln-type: "os,library"
+          severity: "CRITICAL"
+ 
+      - name: Generate deployment package
+        run: zip -r deploy.zip . -x '*.git*'
+ 
+      - name: Deploy to EB
+        uses: einaregilsson/beanstalk-deploy@v18
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_KEY }}
+          application_name: docker
+          environment_name: Docker-env
+          existing_bucket_name: elasticbeanstalk-eu-central-1-934544062828  
+          region: eu-central-1
+          version_label: ${{ github.sha }}
+          deployment_package: deploy.zip
+          use_existing_version_if_available: true
