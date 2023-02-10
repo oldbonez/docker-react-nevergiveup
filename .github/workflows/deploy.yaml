@@ -16,6 +16,16 @@ on:
       - main
  
 jobs:
+  git-leaks:
+    name: secrets detection
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   sonarcloud:
     name: SonarCloud
     runs-on: ubuntu-latest
