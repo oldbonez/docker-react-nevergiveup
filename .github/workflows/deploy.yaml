@@ -99,22 +99,22 @@ jobs:
         run: |
           eb deploy ${{ secrets.EBS_DEPLOYMENT_ENV }} -l ${{ secrets.EBS_DEPLOYMENT_ENV }}-${{ github.sha }}
 
-  deploy-githubactions:
-    needs: [git-leaks, sonarcloud,build]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Generate deployment package
-        run: zip -r deploy-source.zip . -x '*.git*'
- 
-      - name: Deploy to EB
-        uses: einaregilsson/beanstalk-deploy@v18
-        with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
-          aws_secret_key: ${{ secrets.AWS_SECRET_KEY }}
-          application_name: docker
-          environment_name: ${{ secrets.EBS_DEPLOYMENT_ENV }}
-          existing_bucket_name: elasticbeanstalk-eu-central-1-934544062828
-          region: ${{ secrets.AWS_DEFAULT_REGION }}
-          version_label: ${{ github.sha }}
-          deployment_package: deploy-source.zip
-          use_existing_version_if_available: true
+#  deploy-githubactions:
+#    needs: [git-leaks, sonarcloud,build]
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Generate deployment package
+#        run: zip -r deploy.zip . -x '*.git*'
+#
+#      - name: Deploy to EB
+#        uses: einaregilsson/beanstalk-deploy@v18
+#        with:
+#          aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
+#          aws_secret_key: ${{ secrets.AWS_SECRET_KEY }}
+#          application_name: docker
+#          environment_name: ${{ secrets.EBS_DEPLOYMENT_ENV }}
+#          existing_bucket_name: elasticbeanstalk-eu-central-1-934544062828
+#          region: ${{ secrets.AWS_DEFAULT_REGION }}
+#          version_label: ${{ github.sha }}
+#          deployment_package: deploy.zip
+#          use_existing_version_if_available: true
