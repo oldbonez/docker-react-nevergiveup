@@ -1,9 +1,9 @@
 name: smoketest pipe
 
 
-#env:
-# DOCKER_TST: oldbonedocker/react-tst
-# DOCKER_PRD: oldbonedocker/ebsprd
+env:
+  DOCKER_TST: oldbonedocker/react-tst
+  DOCKER_PRD: oldbonedocker/ebsprd
 
 on:
   push:
@@ -47,12 +47,12 @@ jobs:
       - uses: actions/checkout@v3
       - run: >-
           echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
-      - run: docker build -t oldbonedocker/react-tst -f Dockerfile.dev .
-      - run: docker run -e CI=true oldbonedocker/react-tst npm test
-      - run: docker build -t oldbonedocker/ebsprd .
+      - run: docker build -t $DOCKER_TST -f Dockerfile.dev .
+      - run: docker run -e CI=true $DOCKER_TST npm test
+      - run: docker build -t $DOCKER_PRD .
       - run: |
-             docker push oldbonedocker/react-tst
-             docker push oldbonedocker/ebsprd
+             docker push $DOCKER_TST
+             docker push $DOCKER_PRD
 
 
       - name: tstsast
@@ -94,9 +94,10 @@ jobs:
       - name: Init EB CLI
         run: |
            eb init ${{ secrets.EBS_DEPLOYMENT_ENV }} -p ${{ secrets.AWS_PLATFORM }} --region ${{ secrets.AWS_DEFAULT_REGION }}
+           eb create ${{ secrets.EBS_DEPLOYMENT_ENV }}
       - name: Deploy to Elastic Beanstalk
         run: |
-          eb --debug deploy ${{ secrets.EBS_DEPLOYMENT_ENV }} -l ${{ secrets.AWS_PLATFORM }}-${{ github.sha }}
+          eb deploy ${{ secrets.EBS_DEPLOYMENT_ENV }} -l ${{ secrets.EBS_DEPLOYMENT_ENV }}-${{ github.sha }}
 
   deploy-githubactions:
     needs: [git-leaks, sonarcloud,build]
