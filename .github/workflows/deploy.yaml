@@ -93,7 +93,7 @@ jobs:
           pip install awsebcli
       - name: Init EB CLI
         run: |
-           eb create ${{ secrets.EBS_DEPLOYMENT_ENV }} --platform ${{ secrets.AWS_PLATFORM }} --region ${{ secrets.AWS_DEFAULT_REGION }}
+           eb init --platform ${{ secrets.AWS_PLATFORM }} --region ${{ secrets.AWS_DEFAULT_REGION }} ${{ secrets.EBS_DEPLOYMENT_ENV }}
       - name: Deploy to Elastic Beanstalk
         run: |
           eb --debug deploy ${{ secrets.EBS_DEPLOYMENT_ENV }} -l ${{ secrets.EBS_DEPLOYMENT_ENV }}-${{ secrets.AWS_PLATFORM }}-${{ github.sha }}
