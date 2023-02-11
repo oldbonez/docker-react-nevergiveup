@@ -96,14 +96,14 @@ jobs:
 #           eb init --platform ${{ secrets.AWS_PLATFORM }} --region ${{ secrets.AWS_DEFAULT_REGION }} ${{ secrets.EBS_DEPLOYMENT_ENV }}
 #      - name: Deploy to Elastic Beanstalk
 #        run: |
-#          eb deploy ${{ secrets.EBS_DEPLOYMENT_ENV }} -l ${{ secrets.EBS_DEPLOYMENT_ENV }}-${{ secrets.AWS_PLATFORM }}-${{ github.sha }}
+#          eb deploy ${{ secrets.EBS_DEPLOYMENT_ENV }} -l ${{ secrets.AWS_PLATFORM }}-${{ github.sha }}
 
   deploy-githubactions:
     needs: [git-leaks, sonarcloud,build]
     runs-on: ubuntu-latest
     steps:
       - name: Generate deployment package
-        run: zip -r docker-react-nevergiveup-source.zip . -x '*.git*'
+        run: zip -r ${{ secrets.EBS_DEPLOYMENT_ENV }}-source.zip . -x '*.git*'
  
       - name: Deploy to EB
         uses: einaregilsson/beanstalk-deploy@v18
@@ -115,5 +115,5 @@ jobs:
           existing_bucket_name: elasticbeanstalk-eu-central-1-934544062828
           region: ${{ secrets.AWS_DEFAULT_REGION }}
           version_label: ${{ github.sha }}
-          deployment_package: deploy.zip
+          deployment_package: ${{ secrets.EBS_DEPLOYMENT_ENV }}-source.zip
           use_existing_version_if_available: true
