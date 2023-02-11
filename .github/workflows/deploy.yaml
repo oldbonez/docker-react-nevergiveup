@@ -103,7 +103,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Generate deployment package
-        run: zip -r ${{ secrets.EBS_DEPLOYMENT_ENV }}-source.zip . -x '*.git*'
+        run: zip -r deploy-source.zip . -x '*.git*'
  
       - name: Deploy to EB
         uses: einaregilsson/beanstalk-deploy@v18
@@ -115,5 +115,5 @@ jobs:
           existing_bucket_name: elasticbeanstalk-eu-central-1-934544062828
           region: ${{ secrets.AWS_DEFAULT_REGION }}
           version_label: ${{ github.sha }}
-          deployment_package: ${{ secrets.EBS_DEPLOYMENT_ENV }}-source.zip
+          deployment_package: deploy-source.zip
           use_existing_version_if_available: true
