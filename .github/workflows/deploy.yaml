@@ -41,7 +41,7 @@ jobs:
 
   build:
     name: docker_container_build_vulnscan
-    needs: [sonarcloud]
+    needs: [gitleaks,sonarcloud]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -75,7 +75,7 @@ jobs:
           vuln-type: "os,library"
           severity: "CRITICAL"
   deploy-ebscli:
-    needs: [sonarcloud,build]
+    needs: [git-leaks,sonarcloud,build]
     runs-on: ubuntu-latest
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
@@ -93,11 +93,11 @@ jobs:
           pip install awsebcli
       - name: Init EB CLI
         run: |
-           eb init ${{ secrets.EBS_DEPLOYMENT_ENV }} -p ${{ secrets.AWS_PLATFORM }} --region ${{ secrets.AWS_DEFAULT_REGION }}
-           eb create ${{ secrets.EBS_DEPLOYMENT_ENV }}
+           eb init ${{ secrets.EBS_DEPLOYMENT_ENV }}-${{ github.head_ref }} -p ${{ secrets.AWS_PLATFORM }} --region ${{ secrets.AWS_DEFAULT_REGION }}
+           eb create ${{ secrets.EBS_DEPLOYMENT_ENV }}-${{ github.head_ref }}
       - name: Deploy to Elastic Beanstalk
         run: |
-          eb deploy ${{ secrets.EBS_DEPLOYMENT_ENV }} -l ${{ secrets.EBS_DEPLOYMENT_ENV }}-${{ github.sha }}
+          eb deploy ${{ secrets.EBS_DEPLOYMENT_ENV }}-${{ github.head_ref }} -l ${{ secrets.EBS_DEPLOYMENT_ENV }}-${{ github.sha }}
 
 #  deploy-githubactions:
 #    needs: [git-leaks, sonarcloud,build]
