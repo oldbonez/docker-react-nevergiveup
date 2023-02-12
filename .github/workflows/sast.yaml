@@ -56,9 +56,4 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           image: $DOCKER_PRD:$(date '+%Y-%m-%d')-${GITHUB_SHA:0:8}
-          args: --file=Dockerfile --severity-threshold=high
-      - name: Upload result to GitHub Code Scanning
-        uses: github/codeql-action/upload-sarif@v2
-        with:
-          sarif_file: snyk.sarif
-
+          args: --severity-threshold=high
