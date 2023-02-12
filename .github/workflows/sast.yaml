@@ -1,8 +1,5 @@
 name: sastscan
 
-env:
-  DOCKER_PRD: oldbonedocker/ebsprd
-
 on:
   push:
     branches: [ "main" ]
@@ -15,8 +12,8 @@ permissions:
   contents: read
 
 jobs:
-  dockerbuild:
-    name: dockerbuild
+  trivyscan:
+    name: trivdockerscan
     runs-on: "ubuntu-latest"
     permissions:
       contents: read # for actions/checkout to fetch code
@@ -28,12 +25,12 @@ jobs:
 
       - name: Build an image from Dockerfile
         run: |
-          docker build -t $DOCKER_PRD:$(date '+%Y-%m-%d')-${GITHUB_SHA:0:8} .
+          docker build -t docker.io/my-organization/my-app:${{ github.sha }} .
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@7b7aa264d83dc58691451798b4d117d53d21edfe
         with:
-          image-ref: "$DOCKER_PRD:$(date '+%Y-%m-%d')-${GITHUB_SHA:0:8}"
+          image-ref: 'docker.io/my-organization/my-app:${{ github.sha }}'
           format: 'template'
           template: '@/contrib/sarif.tpl'
           output: 'trivy-results.sarif'
