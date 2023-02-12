@@ -41,7 +41,7 @@ jobs:
 
   build:
     name: docker_container_build_vulnscan
-    needs: [git-leaks, sonarcloud]
+    needs: [sonarcloud]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -75,7 +75,7 @@ jobs:
           vuln-type: "os,library"
           severity: "CRITICAL"
   deploy-ebscli:
-    needs: [git-leaks, sonarcloud,build]
+    needs: [sonarcloud,build]
     runs-on: ubuntu-latest
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
