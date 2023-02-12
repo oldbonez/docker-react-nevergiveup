@@ -35,7 +35,8 @@ jobs:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       - name: Install depencies for test coverage
         run: |
-        yarn add @babel/preset-react @babel/plugin-syntax-jsx --dev
+        yarn add @babel/preset-react
+        yarn add @babel/plugin-syntax-jsx --dev
         yarn
       - name: App test and coverage
         run: yarn jest --coverage
