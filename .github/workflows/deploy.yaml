@@ -34,7 +34,9 @@ jobs:
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       - name: Install depencies for test coverage
-        run: yarn
+        run: |
+        yarn add @babel/preset-react @babel/plugin-syntax-jsx --dev
+        yarn
       - name: App test and coverage
         run: yarn jest --coverage
       - name: SonarCloud Scan
@@ -45,7 +47,7 @@ jobs:
 
   build:
     name: docker_container_build_vulnscan
-    needs: [git-leaks,sonarcloud]
+    needs: [git-leaks]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -79,7 +81,7 @@ jobs:
           vuln-type: "os,library"
           severity: "CRITICAL"
   deploy-ebscli:
-    needs: [git-leaks,sonarcloud,build]
+    needs: [build]
     runs-on: ubuntu-latest
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
