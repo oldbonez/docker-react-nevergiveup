@@ -99,11 +99,11 @@ jobs:
           pip install awsebcli
       - name: Init EB CLI
         run: |
-           eb init ${{ secrets.EBS_DEPLOYMENT_ENV }}-${GITHUB_SHA:0:3} -p ${{ secrets.AWS_PLATFORM }} --region ${{ secrets.AWS_DEFAULT_REGION }}
+           eb init ${{ secrets.EBS_DEPLOYMENT_ENV }}-${GITHUB_SHA:0:4} -p ${{ secrets.AWS_PLATFORM }} --region ${{ secrets.AWS_DEFAULT_REGION }}
            eb create ${{ secrets.EBS_DEPLOYMENT_ENV }}-${GITHUB_SHA:0:3}
       - name: Deploy to Elastic Beanstalk
         run: |
-          eb deploy ${{ secrets.EBS_DEPLOYMENT_ENV }}-${GITHUB_SHA:0:3} -l ${GITHUB_SHA:0}
+          eb deploy ${{ secrets.EBS_DEPLOYMENT_ENV }}-${GITHUB_SHA:0:4} -l v-${GITHUB_SHA:8}
 
 #  deploy-githubactions:
 #    needs: [git-leaks, sonarcloud,build]
