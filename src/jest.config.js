@@ -1,7 +1,10 @@
-import type {Config} from 'jest';
+import type { Config } from 'jest';
 
 const config: Config = {
   verbose: true,
+  transform: {
+    '^.+\\.tsx?$': 'babel-jest',
+  },
 };
 
-export default config;
+module.exports = config;
