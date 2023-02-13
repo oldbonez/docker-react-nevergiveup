@@ -36,7 +36,7 @@ jobs:
       - name: Install depencies for test coverage
         run: |
           yarn install
-          yarn add @babel/preset-env @babel/preset-react @babel/plugin-syntax-jsx @babel/core @testing-library/dom @babel/plugin-syntax-flow @babel/plugin-transform-react-jsx typescript --dev
+          yarn add --dev babel-jest @types/jest @babel/preset-typescript @babel/core @babel/preset-env @babel/preset-react @babel/plugin-syntax-jsx @testing-library/dom @babel/plugin-syntax-flow @babel/plugin-transform-react-jsx typescript --dev
       - name: App test and coverage
         run: yarn jest --coverage
       - name: SonarCloud Scan
@@ -107,7 +107,8 @@ jobs:
       - name: Deploy to Elastic Beanstalk
         id: ebsdeployment
         run: |
-          eb deploy ${{ secrets.EBS_DEPLOYMENT_ENV }}-$(date '+%Y%m%d')-${GITHUB_SHA:0:8} -l ${RELEASE_NAME}
+          eb deploy ${{ secrets.EBS_DEPLOYMENT_ENV }}-$(date '+%Y%m%d')-${GITHUB_SHA:0:8} -l ${{ secrets.EBS_DEPLOYMENT_ENV }}-${{ github.sha }}
+        # ${RELEASE_NAME}
         #  eb deploy $EBS_ENV -l $EBS_ENV-${{ github.sha }} #fallback solution if partial sha is not working
       - name: terminate environment
         id: cleanup
