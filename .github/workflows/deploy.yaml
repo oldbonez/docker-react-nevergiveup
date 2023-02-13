@@ -94,7 +94,7 @@ jobs:
         id: pyinstall
         uses: actions/setup-python@v4
         with:
-          python-version: 3.11.2
+          python-version: 3.12.0-alpha.5
       - name: Install EB CLI using pip
         id: pyvenv_ebscli_install
         run: |
@@ -102,17 +102,18 @@ jobs:
           pip install awsebcli
       - name: Init EB CLI
         run: |
-           eb init ${{ secrets.EBS_DEPLOYMENT_ENV }}-$(date '+%Y%m%d')-${GITHUB_SHA:0:8} -p ${{ secrets.AWS_PLATFORM }} --region ${{ secrets.AWS_DEFAULT_REGION }}
-           eb create ${{ secrets.EBS_DEPLOYMENT_ENV }}-$(date '+%Y%m%d')-${GITHUB_SHA:0:8}
+           eb init ${{ secrets.EBS_DEPLOYMENT_ENV }}_$(date '+%Y%m%d')_${GITHUB_SHA:0:8} -p ${{ secrets.AWS_PLATFORM }} --region ${{ secrets.AWS_DEFAULT_REGION }}
+           eb create ${{ secrets.EBS_DEPLOYMENT_ENV }}_$(date '+%Y%m%d')_${GITHUB_SHA:0:8}
       - name: Deploy to Elastic Beanstalk
         id: ebsdeployment
         run: |
-          eb deploy ${{ secrets.EBS_DEPLOYMENT_ENV }}-$(date '+%Y%m%d')-${GITHUB_SHA:0:8} -l ${{ github.sha }}
+          eb deploy ${{ secrets.EBS_DEPLOYMENT_ENV }}_$(date '+%Y%m%d')_${GITHUB_SHA:0:8}
+        #-l ${{ github.sha }}
         # ${RELEASE_NAME}
         #  eb deploy $EBS_ENV -l $EBS_ENV-${{ github.sha }} #fallback solution if partial sha is not working
       - name: terminate environment
         id: cleanup
-        run: echo ${{ secrets.EBS_DEPLOYMENT_ENV }}-$(date '+%Y%m%d')-${GITHUB_SHA:0:8} | eb terminate ${{ secrets.EBS_DEPLOYMENT_ENV }}-$(date '+%Y%m%d')-${GITHUB_SHA:0:8}
+        run: echo ${{ secrets.EBS_DEPLOYMENT_ENV }}_$(date '+%Y%m%d')_${GITHUB_SHA:0:8} | eb terminate ${{ secrets.EBS_DEPLOYMENT_ENV }}_$(date '+%Y%m%d')_${GITHUB_SHA:0:8}
         if: failure()
       - name: Retrieve environment URL
         run: eb status --verbose
