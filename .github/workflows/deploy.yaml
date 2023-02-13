@@ -3,7 +3,7 @@ name: smoketest pipe
 env:
   DOCKER_TST: oldbonedocker/react-tst
   DOCKER_PRD: oldbonedocker/ebsprd
-  EBS_ENV: ${{ secrets.EBS_DEPLOYMENT_ENV }}_$(date '+%Y-%m-%d')_${GITHUB_SHA:0:8}
+  EBS_ENV: "${{ secrets.EBS_DEPLOYMENT_ENV }}_$(date '+%Y-%m-%d')_${GITHUB_SHA:0:8}"
 
 on:
   push:
@@ -16,7 +16,6 @@ on:
       - main
  
 jobs:
-
   git-leaks:
     name: secrets detection
     runs-on: ubuntu-latest
@@ -53,7 +52,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: dockerbldtst
         id: dockerbldtst
       - run: >-
           echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
@@ -115,7 +113,7 @@ jobs:
       - name: terminate environment
         id: cleanup
         run: eb terminate $EBS_ENV
-        if: steps.ebsdeployment.status == 'failure'
+        if: ${{ failure() && steps.ebsdeployment.conclusion == 'failure' }}
       - name: Retrieve environment URL
         run: eb status --verbose
         id: retrieve-url
@@ -135,7 +133,7 @@ jobs:
 #        with:
 #          token: ${{ secrets.GITHUB_TOKEN }}
 #          docker_name: "owasp/zap2docker-stable"
-#          target: "https://${{ needs.ebsdeployment.outputs.service-url }}"
+#          target: "http://${{ needs.ebsdeployment.outputs.service-url }}"
 #          rules_file_name: ".zap/rules.tsv"
 #          cmd_options: "-a"
 
