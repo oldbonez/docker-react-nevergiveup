@@ -36,6 +36,8 @@ jobs:
       - name: Install depencies for test coverage
         run: |
           yarn add @babel/preset-react --dev
+          yarn add @babel/plugin-syntax-jsx --dev
+          yarn add @babel/preset-react --dev
           yarn
       - name: App test and coverage
         run: yarn jest --coverage
@@ -98,7 +100,7 @@ jobs:
         env:
           TAG_NAME: nightly_${{ env.date }}-${GITHUB_SHA:8}
           RELEASE_NAME: release_${{ env.date }}-${GITHUB_SHA:8}
-          EBS_ENV: ${{ env.date }}_{GITHUB_SHA:0:8})
+          EBS_ENV: ${{ secrets.EBS_DEPLOYMENT_ENV }}_${{ env.date }}_{GITHUB_SHA:0:8})
       - uses: actions/checkout@v3
       - name: Install Python 3
         id: pyinstall
