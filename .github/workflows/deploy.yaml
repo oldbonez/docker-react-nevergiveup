@@ -114,7 +114,7 @@ jobs:
         #  eb deploy $EBS_ENV -l $EBS_ENV-${{ github.sha }} #fallback solution if partial sha is not working
       - name: terminate environment
         id: cleanup
-        run: echo ${{ secrets.EBS_DEPLOYMENT_ENV }}-$(date '+%Y%m%d')-${GITHUB_SHA:0} | eb terminate ${{ secrets.EBS_DEPLOYMENT_ENV }}-$(date '+%Y%m%d')-${GITHUB_SHA:0:8}
+        run: echo ${{ secrets.EBS_DEPLOYMENT_ENV }}-$(date '+%Y%m%d')-${GITHUB_SHA:0} | eb terminate ${{ secrets.EBS_DEPLOYMENT_ENV }}-$(date '+%Y%m%d')-${GITHUB_SHA:0}
         if: failure()
       - name: Retrieve environment URL
         run: eb status --verbose
