@@ -88,8 +88,17 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_KEY }}
       AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-      EBS_ENV: ${{ secrets.EBS_DEPLOYMENT_ENV }}_$(date '+%Y-%m-%d')_$(echo {GITHUB_SHA:0:8})
     steps:
+      - name: Get current date
+        id: date
+        run: |
+          echo "{date}={$(date +'%Y%m%d%H%M')}" >> $GITHUB_STATE
+      - name: Test with environment variables
+        run: echo $TAG_NAME - $RELEASE_NAME
+        env:
+          TAG_NAME: nightly_${{ env.date }}-${GITHUB_SHA:8}
+          RELEASE_NAME: release_${{ env.date }}-${GITHUB_SHA:8}
+          EBS_ENV: ${{ env.date }}_{GITHUB_SHA:0:8})
       - uses: actions/checkout@v3
       - name: Install Python 3
         id: pyinstall
@@ -108,7 +117,7 @@ jobs:
       - name: Deploy to Elastic Beanstalk
         id: ebsdeployment
         run: |
-          eb deploy $EBS_ENV -l r-${GITHUB_SHA:8}
+          eb deploy $EBS_ENV -l ${RELEASE_NAME}
         #  eb deploy $EBS_ENV -l $EBS_ENV-${{ github.sha }} #fallback solution if partial sha is not working
       - name: terminate environment
         id: cleanup
