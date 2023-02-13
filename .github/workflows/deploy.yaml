@@ -36,7 +36,7 @@ jobs:
       - name: Install depencies for test coverage
         run: |
           yarn install
-          yarn add --dev babel-jest @types/jest @babel/preset-typescript @babel/core @babel/preset-env @babel/preset-react @babel/plugin-syntax-jsx @testing-library/dom @babel/plugin-syntax-flow @babel/plugin-transform-react-jsx typescript --dev
+          yarn add babel-jest @types/jest @babel/preset-typescript @babel/core @babel/preset-env @babel/preset-react @babel/plugin-syntax-jsx @testing-library/dom @babel/plugin-syntax-flow @babel/plugin-transform-react-jsx typescript --dev
       - name: App test and coverage
         run: yarn jest --coverage
       - name: SonarCloud Scan
