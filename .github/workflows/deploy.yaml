@@ -3,7 +3,7 @@ name: smoketest pipe
 env:
   DOCKER_TST: oldbonedocker/react-tst
   DOCKER_PRD: oldbonedocker/ebsprd
-  EBS_ENV: "${{ secrets.EBS_DEPLOYMENT_ENV }}_$(date '+%Y-%m-%d')_${GITHUB_SHA:0:8}"
+  EBS_ENV: ${{ secrets.EBS_DEPLOYMENT_ENV }}_$(date '+%Y-%m-%d')_${GITHUB_SHA:0:8}
 
 on:
   push:
