@@ -107,13 +107,13 @@ jobs:
       - name: Deploy to Elastic Beanstalk
         id: ebsdeployment
         run: |
-          eb deploy ${{ secrets.EBS_DEPLOYMENT_ENV }}-$(date '+%Y%m%d')-${GITHUB_SHA:0:8} -l ${{ secrets.EBS_DEPLOYMENT_ENV }}-${{ github.sha }}
+          eb deploy ${{ secrets.EBS_DEPLOYMENT_ENV }}-$(date '+%Y%m%d')-${GITHUB_SHA:0:8} -l ${{ github.sha }}
         # ${RELEASE_NAME}
         #  eb deploy $EBS_ENV -l $EBS_ENV-${{ github.sha }} #fallback solution if partial sha is not working
       - name: terminate environment
         id: cleanup
         run: eb terminate ${{ secrets.EBS_DEPLOYMENT_ENV }}-$(date '+%Y%m%d')-${GITHUB_SHA:0:8}
-        if: ${{ failure() && steps.ebsdeployment.conclusion == 'failure' }}
+        if: failure()
       - name: Retrieve environment URL
         run: eb status --verbose
         id: retrieve-url
