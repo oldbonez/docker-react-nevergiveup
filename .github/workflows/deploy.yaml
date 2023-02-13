@@ -36,7 +36,7 @@ jobs:
       - name: Install depencies for test coverage
         run: |
           yarn install
-          yarn add @babel/plugin-syntax-jsx --dev
+          yarn add @babel/preset-env @babel/preset-react @babel/plugin-syntax-jsx @babel/core --dev
       - name: App test and coverage
         run: yarn jest --coverage
       - name: SonarCloud Scan
@@ -89,16 +89,6 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_KEY }}
       AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
     steps:
-      - name: Get current date
-        id: date
-        run: |
-          echo "{date}={$(date +'%Y%m%d%H%M')}" >> $GITHUB_STATE
-      - name: Test with environment variables
-        run: echo $TAG_NAME - $RELEASE_NAME
-        env:
-          TAG_NAME: nightly_${{ env.date }}-${GITHUB_SHA:8}
-          RELEASE_NAME: release_${{ env.date }}-${GITHUB_SHA:8}
-          EBS_ENV: ${{ secrets.EBS_DEPLOYMENT_ENV }}_${{ env.date }}_${GITHUB_SHA:0:8}
       - uses: actions/checkout@v3
       - name: Install Python 3
         id: pyinstall
@@ -112,16 +102,16 @@ jobs:
           pip install awsebcli
       - name: Init EB CLI
         run: |
-           eb init $EBS_ENV -p ${{ secrets.AWS_PLATFORM }} --region ${{ secrets.AWS_DEFAULT_REGION }}
-           eb create $EBS_ENV
+           eb init ${{ secrets.EBS_DEPLOYMENT_ENV }}-$(date '+%Y%m%d')-${GITHUB_SHA:0:8} -p ${{ secrets.AWS_PLATFORM }} --region ${{ secrets.AWS_DEFAULT_REGION }}
+           eb create ${{ secrets.EBS_DEPLOYMENT_ENV }}-$(date '+%Y%m%d')-${GITHUB_SHA:0:8}
       - name: Deploy to Elastic Beanstalk
         id: ebsdeployment
         run: |
-          eb deploy $EBS_ENV -l ${RELEASE_NAME}
+          eb deploy ${{ secrets.EBS_DEPLOYMENT_ENV }}-$(date '+%Y%m%d')-${GITHUB_SHA:0:8} -l ${RELEASE_NAME}
         #  eb deploy $EBS_ENV -l $EBS_ENV-${{ github.sha }} #fallback solution if partial sha is not working
       - name: terminate environment
         id: cleanup
-        run: eb terminate $EBS_ENV
+        run: eb terminate ${{ secrets.EBS_DEPLOYMENT_ENV }}-$(date '+%Y%m%d')-${GITHUB_SHA:0:8}
         if: ${{ failure() && steps.ebsdeployment.conclusion == 'failure' }}
       - name: Retrieve environment URL
         run: eb status --verbose
