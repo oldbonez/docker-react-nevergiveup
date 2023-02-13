@@ -114,7 +114,7 @@ jobs:
         #  eb deploy $EBS_ENV -l $EBS_ENV-${{ github.sha }} #fallback solution if partial sha is not working
       - name: terminate environment
         id: cleanup
-        run: echo ${{ secrets.EBS_DEPLOYMENT_ENV }}-$(date '+%Y%m%d')-${GITHUB_SHA:0} | eb terminate ${{ secrets.EBS_DEPLOYMENT_ENV }}-$(date '+%Y%m%d')-${GITHUB_SHA:0}
+        run: eb terminate --all --force
         if: failure()
       - name: Retrieve environment URL
         run: eb status --verbose
@@ -148,19 +148,19 @@ jobs:
 #      - ebs-deploy
 #    if: failure()
 #    steps:
-#
+#      - name: Checkout source code
+#        uses: actions/checkout@v2
 #      - name: Generate deployment package
 #        run: zip -r deploy.zip . -x '*.git*'
 #
 #      - name: Deploy to EB
-#        uses: einaregilsson/beanstalk-deploy@v18
+#        uses: einaregilsson/beanstalk-deploy@v21
 #        with:
 #          aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
 #          aws_secret_key: ${{ secrets.AWS_SECRET_KEY }}
-#          application_name: docker
+#          application_name: ${{ secrets.AWS_PLATFORM }}
 #          environment_name: ${{ secrets.EBS_DEPLOYMENT_ENV }}
-#          existing_bucket_name: elasticbeanstalk-eu-central-1-934544062828
 #          region: ${{ secrets.AWS_DEFAULT_REGION }}
-#          version_label: ${{ github.sha }}
+#          version_label: ${{ github.ref_name }}-$(date '+%Y%m%d')-${GITHUB_SHA:0:10}
 #          deployment_package: deploy.zip
 #          use_existing_version_if_available: true
