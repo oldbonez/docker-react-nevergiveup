@@ -4,9 +4,7 @@ WORKDIR '/app'
 
 COPY package.json .
 
-RUN apk update && apk upgrade && npm install
-
-RUN npm install -g npm-check-updates && ncu --upgrade && rm -rf /var/cache/apk/*
+RUN apk update && apk upgrade && npm install && rm -rf /var/cache/apk/*
 
 COPY . .
 
