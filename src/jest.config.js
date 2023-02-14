@@ -3,9 +3,9 @@ const Config = require('jest').Config;
 const config = {
   verbose: true,
   transform: {
-    '^.+\\.tsx?$': 'babel-jest',
+    '^.+\\.jsx?$': 'babel-jest',
   },
-  testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.(ts|tsx|js)$',
+  testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.jsx?$',
 };
 
 module.exports = config;

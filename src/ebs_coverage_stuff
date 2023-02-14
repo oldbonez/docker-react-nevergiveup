@@ -1,0 +1,3 @@
+eb init -i t2.micro my-multi-container-docker-application
+#generate coverage in npm
+CI=true npm test  -- --coverage
