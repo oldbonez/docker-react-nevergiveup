@@ -1,6 +1,6 @@
-const { Config } = require('jest');
+const Config = require('jest').Config;
 
-const config: Config = {
+const config = {
   verbose: true,
   transform: {
     '^.+\\.tsx?$': 'babel-jest',
