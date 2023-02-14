@@ -35,6 +35,8 @@ jobs:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       - name: Install depencies for test coverage
         run: |
+          pwd
+          ls -laR
           yarn install
           yarn add --dev jest @jest/globals babel-jest @types/jest @babel/core @babel/preset-typescript @babel/preset-env @babel/preset-react @babel/plugin-syntax-jsx @testing-library/dom @babel/plugin-syntax-flow @babel/plugin-transform-react-jsx typescript ts-node @types/node
       - name: App test and coverage
