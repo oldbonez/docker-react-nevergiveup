@@ -141,11 +141,12 @@ jobs:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
           aws_secret_key: ${{ secrets.AWS_SECRET_KEY }}
           application_name: ${{ secrets.AWS_PLATFORM }}
-          environment_name: ${{ secrets.EBS_DEPLOYMENT_ENV }}
+          environment_name: ${{ secrets.EBS_ENV2 }}
+          existing_bucket_name: ${{ secrets.EBS_S3_BUCKET }}
           region: ${{ secrets.AWS_DEFAULT_REGION }}
-          version_label: ${{ github.sha }}-fallback
+          version_label: ${{ github.run_number }}_${{ github.sha }}
           deployment_package: deploy.zip
-          use_existing_version_if_available: false
+          use_existing_version_if_available: true
 
   eb-url-check:
     needs:
