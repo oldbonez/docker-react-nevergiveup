@@ -131,7 +131,7 @@ jobs:
     if: failure()
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Generate deployment package
         run: zip -r deploy.zip . -x '*.git*' -x '*.elasticbeanstalk'
 
