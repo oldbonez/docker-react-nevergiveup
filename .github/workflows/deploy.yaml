@@ -145,7 +145,7 @@ jobs:
           region: ${{ secrets.AWS_DEFAULT_REGION }}
           version_label: rel-$(date '+%Y%m%d%s')-${GITHUB_SHA:0:8}
           deployment_package: deploy.zip
-          use_existing_version_if_available: true
+          use_existing_version_if_available: false
 
   eb-url-check:
     needs:
