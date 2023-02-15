@@ -49,6 +49,18 @@
     "transform": {
       "^.+\\.tsx?$": "babel-jest",
       "^.+\\.jsx?$": "babel-jest"
-    }
+    },
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "!src/index.js",
+      "!src/hooks/*.js",
+      "!src/context/*.js",
+      "!src/babel.config.js",
+      "!src/jest.config.js"
+    ],
+    "coverageReporters": [
+      "html",
+      "text"
+    ]
   }
 }

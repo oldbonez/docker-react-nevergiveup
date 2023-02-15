@@ -46,7 +46,9 @@ jobs:
 
   build:
     name: docker_container_cicd_sast
-    needs: [git-leaks]
+    needs:
+      - git-leaks
+      - sonarcloud
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -80,8 +82,11 @@ jobs:
           vuln-type: "os,library"
           severity: "CRITICAL"
 
-  ebs-deploy:
-    needs: [build]
+  eb-cli-deploy:
+    needs:
+      - git-leaks
+      - sonarcloud
+      - build
     runs-on: ubuntu-latest
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
@@ -104,8 +109,8 @@ jobs:
            eb init ${{ secrets.EBS_DEPLOYMENT_ENV }}-$(date '+%Y%m%d')-${GITHUB_SHA:0:6} -p ${{ secrets.AWS_PLATFORM }} --region ${{ secrets.AWS_DEFAULT_REGION }}
            eb create ${{ secrets.EBS_DEPLOYMENT_ENV }}-$(date '+%Y%m%d')-${GITHUB_SHA:0:6}
            eb status --verbose
-      - name: Deploy to Elastic Beanstalk
-        id: ebsdeployment
+      - name: Deploy to Elastic Beanstalk via cli
+        id: eb-cli-deploy
         run: |
           eb deploy ${{ secrets.EBS_DEPLOYMENT_ENV }}-$(date '+%Y%m%d')-${GITHUB_SHA:0:6} -l ${{ github.sha }}
         #-l ${{ github.sha }}
@@ -115,6 +120,58 @@ jobs:
         id: cleanup
         run: eb terminate ${{ secrets.EBS_DEPLOYMENT_ENV }}-$(date '+%Y%m%d')-${GITHUB_SHA:0:6} --force
         if: failure()
+
+  eb-deploy-githubactions:
+    runs-on: ubuntu-latest
+    needs:
+      - git-leaks
+      - sonarcloud
+      - build
+      - eb-cli-deploy
+    if: failure()
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
+      - name: Generate deployment package
+        run: zip -r deploy.zip . -x '*.git*'
+
+      - name: Deploy to EB
+        uses: einaregilsson/beanstalk-deploy@v21
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_KEY }}
+          application_name: ${{ secrets.AWS_PLATFORM }}
+          environment_name: ${{ secrets.EBS_DEPLOYMENT_ENV }}
+          region: ${{ secrets.AWS_DEFAULT_REGION }}
+          version_label: ${{ github.ref_name }}-$(date '+%Y%m%d')-${GITHUB_SHA:0:10}
+          deployment_package: deploy.zip
+          use_existing_version_if_available: true
+
+  eb-url-check:
+    needs:
+      - git-leaks
+      - sonarcloud
+      - build
+      - eb-cli-deploy
+      - eb-deploy-githubactions
+    if: needs.eb-cli-deploy.result == 'success' || needs.eb-deploy-githubactions.result == 'success'
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_KEY }}
+      AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Python 3
+        id: pynstall
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.12.0-alpha.5
+      - name: Install EB CLI using pip
+        id: pyvenv_ebscli_install
+        run: |
+          python -m pip install --upgrade pip
+          pip install awsebcli
       - name: Retrieve environment URL
         run: eb status --verbose
         id: retrieve-url
@@ -122,7 +179,7 @@ jobs:
       - name: Store environment URL
         run: echo "ENV_URL=$(cat $GITHUB_ENV)"
         env:
-          ENV_URL: ${{ steps.retrieve-url.outputs.status }}
+          ENV_URL: ${{ steps.retrieve-url.outputs.status}}
 #
 #  zap_scan:
 #    needs: [ build ]
@@ -137,29 +194,3 @@ jobs:
 #          target: "http://${{ needs.ebsdeployment.outputs.service-url }}"
 #          rules_file_name: ".zap/rules.tsv"
 #          cmd_options: "-a"
-
-#  deploy-githubactions:
-#    runs-on: ubuntu-latest
-#    needs:
-#      - git-leaks
-#      - sonarcloud
-#      - build
-#      - ebs-deploy
-#    if: failure()
-#    steps:
-#      - name: Checkout source code
-#        uses: actions/checkout@v2
-#      - name: Generate deployment package
-#        run: zip -r deploy.zip . -x '*.git*'
-#
-#      - name: Deploy to EB
-#        uses: einaregilsson/beanstalk-deploy@v21
-#        with:
-#          aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
-#          aws_secret_key: ${{ secrets.AWS_SECRET_KEY }}
-#          application_name: ${{ secrets.AWS_PLATFORM }}
-#          environment_name: ${{ secrets.EBS_DEPLOYMENT_ENV }}
-#          region: ${{ secrets.AWS_DEFAULT_REGION }}
-#          version_label: ${{ github.ref_name }}-$(date '+%Y%m%d')-${GITHUB_SHA:0:10}
-#          deployment_package: deploy.zip
-#          use_existing_version_if_available: true
